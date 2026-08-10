@@ -1,22 +1,27 @@
 import Image from "next/image";
 import QuoteSection from "@/components/QuoteSection";
+import { client } from "@/sanity/client";
+import { urlFor } from "@/sanity/image";
+import type { Image as SanityImage } from "sanity";
 
-const MENU_ITEMS = [
-  {
-    label: "01 — Khai vị",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuD4Zg-ZoPQ7L9X0bXJM1eY_Hx8XnMVeyq0YvtG3J9UamVNF5QV3ndWSdzwONkZB3ZAhqT-ssCPNLllUqGjyNilONy1qIoU2hFjn9nhJ36DwbPbw61ml9eT0k4eT7dW2DnWZC6Y4_Xvl9fxDk1Cb_-eyeU3g9m1mioeRAZhMsY--wf0OARpiAOxKhpFwPHUdiG0rN2xubRa0yPzZudqRj7egMIL2eYGIq_fxqTenu1n04KpRvX-Fl1xUh9eBdr_qYaHjEK9FXhHAkD9_",
-  },
-  {
-    label: "02 — Món chính đặc trưng",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCZzj4UvPzVzbAPHp-ax8mgCr9dSgK0U3LNziRJ78wwY744Z0Y5i7ny_PLHdKsmPY__7r6Ozk062jBGH6uA0q7CoshaBFgY0QkktQofbM9qh16xROYP7PL6UhlVr49xwQ1ADyga9N54WNjyNYnXP6c7llA63B--KN5kozzvIf0hYIz9_Hrl5SvlOpTwn5mFfokeMhxXfrmpWmc4eyd8qQgCfICu7QGE8te3uX7Q7hqj8fv7nlcmDaXENUd3XcsOPYg2koYZ7gxSILb4",
-  },
-  {
-    label: "03 — Tráng miệng & Trà",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuBVU6vETmOTaCCRwuxZ3mHAC9qw1kNYPglmvxppv-Ty_MNupll-N3ewsK9OoxzgZxD1oVTX9Jcq9NH4xUqxK93dT4eJMxEnPlMebASf9QuUsEfKOfCgC6yKIcJblZ2sotSUSMlDDrvlHQ40corQ2qa3qW1-M8BnzsWcjdHStw9lY5ysud6Y59zjAwmonSNksH1ZKDZxXi2JMabgOebX0LCxOKy5DVX0GBh45nS7riY7QdMWtNOTXeYqZJLhAVbRjvOD45rcaie6a2Zy",
-  },
-];
+const MENU_QUERY = `*[_type == "nhaHangPage"][0]{
+  menuItems[]{ label, image }
+}`;
 
-export default function NhaHangPage() {
+type MenuItemDoc = {
+  label: string;
+  image: SanityImage;
+};
+
+export default async function NhaHangPage() {
+  const data = await client.fetch<{ menuItems: MenuItemDoc[] } | null>(
+    MENU_QUERY
+  );
+  const menuItems = (data?.menuItems ?? []).map((item) => ({
+    label: item.label,
+    img: urlFor(item.image).width(900).url(),
+  }));
+
   return (
     <>
       {/* Hero */}
@@ -87,7 +92,7 @@ export default function NhaHangPage() {
             </p>
           </div>
           <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-8">
-            {MENU_ITEMS.map((item) => (
+            {menuItems.map((item) => (
               <div key={item.label} className="group">
                 <div className="group-hover:-translate-y-2 bg-white p-2 md:p-4 shadow-[0_10px_30px_-10px_rgba(6,27,14,0.1)] transition-transform duration-500">
                   <div className="relative aspect-[3/4] overflow-hidden bg-surface-container">

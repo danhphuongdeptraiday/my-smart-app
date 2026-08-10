@@ -1,71 +1,43 @@
 import Image from "next/image";
 import QuoteSection from "@/components/QuoteSection";
+import { client } from "@/sanity/client";
+import { urlFor } from "@/sanity/image";
+import type { Image as SanityImage } from "sanity";
 
 const TAGS = ["Thảo mộc hữu cơ", "Dẫn dắt bởi truyền thống", "Nguồn gốc công bằng"];
 
-const SERVICES = [
-  {
-    title: "Tắm lá thuốc Dao Đỏ truyền thống",
-    price: "$45 / 60 phút",
-    desc: "Được thu hái từ những đỉnh núi cao của Hoàng Liên Sơn, bài thuốc đặc trưng của chúng tôi bao gồm hơn 20 loại dược liệu giúp giải độc và phục hồi tinh thần.",
-    tags: ["Thải độc", "Lưu thông"],
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuCg3n0L56HTTXJUgeM1kTLsNtRYs_A4OADrZMPMK5trvSiUvm5cYKj6yiskw7A3JNW36FhqWwIBeYE1YBlBhLG3vjhvKIZTFUM72D6HlAZlpelxWdfEwO5juwHGi5sLIjemO0EsbVWp27sHPJkL98sKGMlKpqRI5Scv1UpL5g8xfPBR5mtNHFcOdPMFDKFOu1ggHW1HKHj_Kk34C0uE6cV3ouKWoUdJoguVmBNV1gSmySk6Jrj7OYmzVWHsVxjMEjjzpaMOHA31qdvs",
-  },
-  {
-    title: "Liệu pháp đá núi",
-    price: "$60 / 90 phút",
-    desc: "Đá núi lửa được làm nóng đặt dọc theo cột sống để giải phóng căng thẳng sâu, kết hợp với massage bằng dầu thảo mộc.",
-    tags: ["Mô sâu", "Làm ấm"],
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDDwM-ePisRapvEIH6z6B8CPmWxNRxnuRAn8UTlJ55fGtx7huRS2gldhZaCOBOZTISy_OKW4tL0ZHQBcg1rc5Ot2NH-6KNFXAHTz8uv2XuNaCxuTIebFTAVHdZZVQdapQNN0vTuSm7XV9oc6IkJ-y9gX_z0rSb3Isp8HK5fqFhy6hancHMzHxoBNLffApp-TXUiWb-2NaSoR9bYEXP79rWlYuQYcWk18_2W72-sEVGPxgs1muIPpCJzu1w52U3-79Ftf0lVqVOdOwAt",
-  },
-  {
-    title: "Chăm sóc mặt Tre & Gạo",
-    price: "$35 / 45 phút",
-    desc: "Tẩy tế bào chết nhẹ nhàng bằng gạo vùng cao xay nhuyễn, sau đó đắp mặt nạ tre làm mát để phục hồi độ sáng cho làn da.",
-    tags: ["Cấp ẩm", "Hữu cơ"],
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDR344BxstI9Y7mhQZebJ9HTJDxhSLkSVoU_OBbX_uLmHe6c2NEMkJIybdNuZ6xo2qrvrx3F2pU_UJRNKDcI5sJ2vohimT6hjEhg3xQ2yLW3ASXanfI3CFtJSFidMRuIwt_GiwLYnveo3dGRslcbWQ92XTQ_AnVdBPaN71vss2rP8L8Zwnskns5XU6qnTR3FM4ZS9yXHwn7tOf9-ZSMjCP972rZeQcpPd7M-zIS0kolyQtXY2nyHvxTWNpHQ0Ldd0eMLNUhPKuEo8rD",
-  },
-];
+const SPA_QUERY = `*[_type == "spaPage"][0]{
+  services[]{ title, price, desc, tags, image },
+  priceList[]{ category, items[]{ name, desc, price } }
+}`;
 
-const PRICE_LIST = [
-  {
-    category: "Các liệu pháp tắm",
-    items: [
-      {
-        name: "Tắm lá thuốc Dao Đỏ truyền thống",
-        desc: "30 phút thải độc sâu trong bồn gỗ pơ-mu",
-        price: "350,000 VND",
-      },
-      {
-        name: "Phòng xông hơi & Sauna",
-        desc: "Xông hơi tinh chất thảo mộc giúp lưu thông hô hấp",
-        price: "200,000 VND",
-      },
-    ],
-  },
-  {
-    category: "Liệu pháp toàn thân",
-    items: [
-      {
-        name: "Massage đá nóng vùng cao",
-        desc: "60 phút trị liệu cơ bắp với đá nóng nhiệt trị liệu",
-        price: "650,000 VND",
-      },
-      {
-        name: "Nghi thức tre bốn tay",
-        desc: "90 phút massage đồng bộ sử dụng thanh tre truyền thống",
-        price: "1,200,000 VND",
-      },
-      {
-        name: "Ủ toàn thân gừng & mật ong",
-        desc: "Tẩy tế bào chết làm ấm cơ thể và dưỡng ẩm sâu",
-        price: "550,000 VND",
-      },
-    ],
-  },
-];
+type SpaServiceDoc = {
+  title: string;
+  price?: string;
+  desc?: string;
+  tags?: string[];
+  image: SanityImage;
+};
 
-export default function SpaPage() {
+type PriceListDoc = {
+  category: string;
+  items: { name: string; desc?: string; price?: string }[];
+};
+
+export default async function SpaPage() {
+  const data = await client.fetch<{
+    services: SpaServiceDoc[];
+    priceList: PriceListDoc[];
+  } | null>(SPA_QUERY);
+  const services = (data?.services ?? []).map((service) => ({
+    title: service.title,
+    price: service.price,
+    desc: service.desc,
+    tags: service.tags ?? [],
+    img: urlFor(service.image).width(900).url(),
+  }));
+  const priceList = data?.priceList ?? [];
+
   return (
     <>
       {/* Hero */}
@@ -139,7 +111,7 @@ export default function SpaPage() {
             <div className="mx-auto mt-4 h-1 w-20 bg-secondary" />
           </div>
           <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8">
-            {SERVICES.map((service) => (
+            {services.map((service) => (
               <div key={service.title} className="group">
                 <div className="relative mb-4 aspect-[4/5] overflow-hidden rounded-lg">
                   <Image
@@ -182,7 +154,7 @@ export default function SpaPage() {
           </p>
         </div>
         <div className="space-y-12">
-          {PRICE_LIST.map((category) => (
+          {priceList.map((category) => (
             <div key={category.category}>
               <h4 className="font-serif text-2xl text-primary border-b border-outline-variant pb-4 mb-8">
                 {category.category}

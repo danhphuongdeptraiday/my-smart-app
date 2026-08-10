@@ -1,39 +1,33 @@
 import Image from "next/image";
 
-const ROOMS = [
-  {
-    title: "Bungalow riêng tư",
-    desc: "Nằm ở vị trí cao nhất, mang đến một giấc ngủ giữa những tầng mây với tầm nhìn ban công toàn cảnh.",
-    price: "Đặt ngay — từ $120",
-    span: "md:col-span-8",
-    bg: "bg-primary",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuA0EKDcweEi5uyd0shHhgLrGZ9vQQNvzwwAeGpahYALhXYJEY7h6xGZddSjvS6lq0ShQFMyc1Up9vWXtX6CXKfq0uIaHKZBon_c3IDKDHBBeKJg8MHYpVRzjFvFTJ2DObj_V2AQhLKC6h3iu-1u9RyHImqtWFXE0oKAm5jbzFq0x-moLDDW1_2h8I5HD_sjKNvoq39ETI5rp1Jt_nD0ML7V_y9acR1tctB4RVlJjrjEIoqoNlwYsc6TxBDeTdWcP_HehZeITUYlhnXV",
-  },
-  {
-    title: "Ban công thông nhau",
-    desc: "Trải nghiệm bồn tắm thảo mộc tại phòng và các nghi thức hương liệu trị liệu.",
-    price: "Đặt ngay — từ $150",
-    span: "md:col-span-4",
-    bg: "bg-secondary",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuDHm2OE9ePeNozV1znODU-1YBpWds5BS-txUGoZLZ7D2CNwkwgu8l7mHaT902gSZ4SWrAV6Hds4BtDcaeV3W8Eu-UcL_yu79CZ53kgWuTxcw8TJXxBQC4gOkJ3nAhr9ZFigUNeBRnj1vGxZ56ZTZ7B4LGAeu2R9LEA2laB-dvhwQzl3asCgWDIU06fz73MsKpqyFl74yo0VVxuAudKheGRcYq5CscdJ32-f6S-oIVdp2NrPTAlTP-M4feFKfEzTm6r8vUt8XTonUu63",
-  },
-  {
-    title: "Giường phụ",
-    desc: "Một không gian trú ẩn riêng tư được xây dựng bằng gỗ tái chế và lò sưởi bằng đá truyền thống.",
-    price: "Đặt ngay — từ $180",
-    span: "md:col-span-4",
-    bg: "bg-tertiary",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuB8gP-v4z5tSrqEgdVxUX6YBnMDvua_Cvu77-wfjIu46xuLRL6LBWxOdqPZSz_-ImDiROb26qc4gPUarAOqLGweI9gzvSNC2vcLtx7UsOQhkjncsGpNh7eOwIzMO5JkSegi_Eqrclp1HTwyirvZcVMSYr_TeO80StnDMCicz-WWnzZYCF_V5bEMKLN8SEjE77sjF5cTEoI02BG19HGjk7nymcAnPOoRt6TlwqwgxT5IkZuh2E3Tj4YcaafIF4abw4FhXC3u_KMxAVAy",
-  },
-  {
-    title: "Gói Phòng & Spa",
-    desc: "Thiết kế tối giản hòa quyện cùng tầm nhìn thung lũng bao la. Hoàn hảo cho khách đi một mình.",
-    price: "Đặt ngay — từ $95",
-    span: "md:col-span-8",
-    bg: "bg-outline",
-    img: "https://lh3.googleusercontent.com/aida-public/AB6AXuAsHIsHRHx8Al0CaeGzLioYHMYZJ5rznKmEo_MCdyVwvuloKLSJDEi51KJzmnTgqSH7ombmXeZdzjBw5ydEAXD9S4DGfREWGAufYvh8XR2Pf7ggvXyu64EiYsT_6St-YBjtBotS2uumY2WZdg0UhAQQ-qAg7FbYpquEk_Fk0kx3ZMOfzgFK6VzDB9J-hxow-qGRcesVK6AjsxBcLpIv79v7lekDMRTy864PgCjkNVZnWVIbI_u1t47Mkpc3I58xnA3K3RtbPrsFLNM3",
-  },
-];
+import { client } from "@/sanity/client";
+import { urlFor } from "@/sanity/image";
+import type { Image as SanityImage } from "sanity";
+
+const HOMESTAY_QUERY = `*[_type == "homestayPage"][0]{
+  rooms[]{ title, desc, price, size, accent, image }
+}`;
+
+type RoomDoc = {
+  title: string;
+  desc?: string;
+  price?: string;
+  size?: "large" | "small";
+  accent?: "primary" | "secondary" | "tertiary" | "outline";
+  image: SanityImage;
+};
+
+const SIZE_CLASSES: Record<string, string> = {
+  large: "md:col-span-8",
+  small: "md:col-span-4",
+};
+
+const ACCENT_CLASSES: Record<string, string> = {
+  primary: "bg-primary",
+  secondary: "bg-secondary",
+  tertiary: "bg-tertiary",
+  outline: "bg-outline",
+};
 
 const EXPERIENCES = [
   {
@@ -54,7 +48,17 @@ const EXPERIENCES = [
   },
 ];
 
-export default function HomestayPage() {
+export default async function HomestayPage() {
+  const data = await client.fetch<{ rooms: RoomDoc[] } | null>(HOMESTAY_QUERY);
+  const rooms = (data?.rooms ?? []).map((room) => ({
+    title: room.title,
+    desc: room.desc,
+    price: room.price,
+    span: SIZE_CLASSES[room.size ?? "small"],
+    bg: ACCENT_CLASSES[room.accent ?? "primary"],
+    img: urlFor(room.image).width(1200).url(),
+  }));
+
   return (
     <>
       {/* Hero */}
@@ -111,7 +115,7 @@ export default function HomestayPage() {
       <section className="bg-surface-container-low py-16 md:py-32">
         <div className="mx-auto max-w-[1280px] px-margin-mobile md:px-margin-desktop">
           <div className="grid grid-cols-1 gap-gutter md:grid-cols-12 md:auto-rows-[400px]">
-            {ROOMS.map((room) => (
+            {rooms.map((room) => (
               <div
                 key={room.title}
                 className={`group relative h-64 overflow-hidden md:h-auto ${room.bg} ${room.span}`}
