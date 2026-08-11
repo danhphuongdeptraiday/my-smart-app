@@ -1,6 +1,13 @@
 allowBuilds:
+  esbuild: true
   sharp: false
   unrs-resolver: false
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+supportedArchitectures:
+  os:
+    - darwin
+  cpu:
+    - arm64
+    - x64
