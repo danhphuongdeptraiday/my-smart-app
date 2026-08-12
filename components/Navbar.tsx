@@ -7,6 +7,7 @@ import { ChatIcon, CloseIcon, MenuIcon } from "./icons";
 
 const NAV_LINKS = [
   { href: "/", label: "Trang chủ" },
+  { href: "/gioi-thieu", label: "Giới thiệu" },
   { href: "/nha-hang", label: "Nhà hàng" },
   { href: "/spa", label: "Spa" },
   { href: "/homestay", label: "Homestay" },

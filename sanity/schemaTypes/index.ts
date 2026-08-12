@@ -1,6 +1,9 @@
 import { type SchemaTypeDefinition } from "sanity";
 
+import { customerReview } from "./customerReview";
 import { eventFeature } from "./eventFeature";
+import { exploreSpot } from "./exploreSpot";
+import { gioiThieuPage } from "./gioiThieuPage";
 import { homePage } from "./homePage";
 import { homestayPage } from "./homestayPage";
 import { menuCategory } from "./menuCategory";
@@ -14,6 +17,8 @@ import { room } from "./room";
 import { season } from "./season";
 import { spaPage } from "./spaPage";
 import { spaService } from "./spaService";
+import { staffMember } from "./staffMember";
+import { storyBlock } from "./storyBlock";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -21,6 +26,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     homestayPage,
     nhaHangPage,
     spaPage,
+    gioiThieuPage,
     room,
     season,
     menuCategory,
@@ -31,5 +37,9 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     spaService,
     priceListItem,
     priceListCategory,
+    exploreSpot,
+    storyBlock,
+    staffMember,
+    customerReview,
   ],
 };
