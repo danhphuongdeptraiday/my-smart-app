@@ -180,8 +180,6 @@ export default async function HomePage() {
         }))
       : FALLBACK_SEASONS;
 
-  console.log("Seasons data:", seasons);
-
   return (
     <>
       {/* Hero */}
