@@ -25,6 +25,13 @@ export const customerReview = defineType({
       type: "number",
       validation: (Rule) => Rule.min(1).max(5),
     }),
+    defineField({
+      name: "googleReviewUrl",
+      title: "Link Google Review",
+      type: "url",
+      description: "Dán link dẫn thẳng tới đánh giá gốc trên Google Maps.",
+      validation: (Rule) => Rule.uri({ scheme: ["http", "https"] }),
+    }),
   ],
   preview: {
     select: { title: "author", subtitle: "quote" },

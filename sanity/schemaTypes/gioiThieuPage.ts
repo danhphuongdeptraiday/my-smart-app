@@ -302,14 +302,7 @@ export const gioiThieuPage = defineType({
       of: [{ type: "customerReview" }],
     }),
 
-    // Liên hệ
-    defineField({
-      name: "contactTitle",
-      title: "Tiêu đề",
-      type: "string",
-      group: "contact",
-      initialValue: "Liên hệ với Lá Dao",
-    }),
+    // Liên hệ — hiển thị ở Footer chung toàn site
     defineField({
       name: "address",
       title: "Địa chỉ hiển thị",
@@ -344,13 +337,6 @@ export const gioiThieuPage = defineType({
       type: "string",
       group: "contact",
       initialValue: "Ladaospa@gmail.com",
-    }),
-    defineField({
-      name: "website",
-      title: "Website",
-      type: "string",
-      group: "contact",
-      initialValue: "Ladaospa.com",
     }),
     defineField({
       name: "phoneNumbers",

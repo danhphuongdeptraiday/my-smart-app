@@ -1,12 +1,6 @@
 import Image from "next/image";
 import QuoteSection from "@/components/QuoteSection";
-import {
-  FacebookIcon,
-  LocationIcon,
-  MailIcon,
-  PhoneIcon,
-  TiktokIcon,
-} from "@/components/icons";
+import ReviewsCarousel from "@/components/ReviewsCarousel";
 import { client } from "@/sanity/client";
 import { urlFor } from "@/sanity/image";
 import type { Image as SanityImage } from "sanity";
@@ -36,14 +30,7 @@ const GIOI_THIEU_QUERY = `*[_type == "gioiThieuPage"][0]{
   staffTitle,
   staffMembers,
   reviewsTitle,
-  reviews,
-  contactTitle,
-  googleMapsUrl,
-  tiktokUrl,
-  facebookUrl,
-  email,
-  website,
-  phoneNumbers
+  reviews
 }`;
 
 type CultureDoc = {
@@ -76,6 +63,7 @@ type CustomerReviewDoc = {
   quote: string;
   author: string;
   rating?: number;
+  googleReviewUrl?: string;
 };
 
 type GioiThieuPageData = {
@@ -104,13 +92,6 @@ type GioiThieuPageData = {
   staffMembers?: StaffMemberDoc[];
   reviewsTitle?: string;
   reviews?: CustomerReviewDoc[];
-  contactTitle?: string;
-  googleMapsUrl?: string;
-  tiktokUrl?: string;
-  facebookUrl?: string;
-  email?: string;
-  website?: string;
-  phoneNumbers?: string[];
 };
 
 const FALLBACK_HERO_IMAGE_URL =
@@ -259,17 +240,6 @@ export default async function GioiThieuPage() {
 
   const reviewsTitle = data?.reviewsTitle || "Khách hàng nói gì về Lá Dao";
   const reviews = data?.reviews ?? [];
-
-  const contactTitle = data?.contactTitle || "Liên hệ với Lá Dao";
-  const googleMapsUrl = data?.googleMapsUrl || "https://maps.app.goo.gl/ni3yffp2ds2vbfKo6?g_st=ic";
-  const tiktokUrl = data?.tiktokUrl || "https://www.tiktok.com/@zdao.spahome.stay";
-  const facebookUrl = data?.facebookUrl || "https://www.facebook.com/share/1NwTkudfi3/?mibextid=wwXIfr";
-  const email = data?.email || "Ladaospa@gmail.com";
-  const website = data?.website || "Ladaospa.com";
-  const phoneNumbers =
-    data?.phoneNumbers && data.phoneNumbers.length > 0
-      ? data.phoneNumbers
-      : ["0946.541.541", "0912.541.541", "0869.699.816"];
 
   return (
     <>
@@ -491,110 +461,10 @@ export default async function GioiThieuPage() {
             <div className="mb-12 text-center md:mb-16">
               <h2 className="font-serif text-3xl md:text-4xl text-primary">{reviewsTitle}</h2>
             </div>
-            <div className="grid grid-cols-1 gap-gutter md:grid-cols-3">
-              {reviews.map((review) => (
-                <div key={review.author} className="bg-surface p-6 md:p-8">
-                  {review.rating && (
-                    <div className="mb-3 text-secondary text-sm">
-                      {"★".repeat(review.rating)}
-                      {"☆".repeat(5 - review.rating)}
-                    </div>
-                  )}
-                  <p className="mb-4 text-sm italic text-on-surface-variant leading-relaxed">
-                    &ldquo;{review.quote}&rdquo;
-                  </p>
-                  <p className="text-xs uppercase tracking-widest text-primary">{review.author}</p>
-                </div>
-              ))}
-            </div>
+            <ReviewsCarousel reviews={reviews} />
           </div>
         </section>
       )}
-
-      {/* Contact */}
-      <section className="px-margin-mobile py-16 md:py-28 md:px-margin-desktop">
-        <div className="mx-auto max-w-[1280px]">
-          <div className="mb-12 text-center md:mb-16">
-            <h2 className="font-serif text-3xl md:text-4xl text-primary">{contactTitle}</h2>
-          </div>
-          <div className="mx-auto grid max-w-3xl grid-cols-1 gap-8 sm:grid-cols-2">
-            <div className="flex items-start gap-4">
-              <PhoneIcon className="h-5 w-5 shrink-0 text-secondary" />
-              <div className="flex flex-col gap-1">
-                {phoneNumbers.map((phone) => (
-                  <a
-                    key={phone}
-                    href={`tel:${phone.replace(/[.\s]/g, "")}`}
-                    className="text-sm text-on-surface-variant hover:text-primary transition-colors"
-                  >
-                    {phone}
-                  </a>
-                ))}
-              </div>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <MailIcon className="h-5 w-5 shrink-0 text-secondary" />
-              <a
-                href={`mailto:${email}`}
-                className="text-sm text-on-surface-variant hover:text-primary transition-colors"
-              >
-                {email}
-              </a>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <LocationIcon className="h-5 w-5 shrink-0 text-secondary" />
-              <a
-                href={googleMapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-on-surface-variant hover:text-primary transition-colors"
-              >
-                Xem trên Google Maps
-              </a>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <span className="flex h-5 w-5 shrink-0 items-center justify-center text-secondary">
-                🌐
-              </span>
-              <a
-                href={`https://${website.replace(/^https?:\/\//, "")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-on-surface-variant hover:text-primary transition-colors"
-              >
-                {website}
-              </a>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <FacebookIcon className="h-5 w-5 shrink-0 text-secondary" />
-              <a
-                href={facebookUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-on-surface-variant hover:text-primary transition-colors"
-              >
-                Facebook
-              </a>
-            </div>
-
-            <div className="flex items-start gap-4">
-              <TiktokIcon className="h-5 w-5 shrink-0 text-secondary" />
-              <a
-                href={tiktokUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-on-surface-variant hover:text-primary transition-colors"
-              >
-                TikTok
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
     </>
   );
 }

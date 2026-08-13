@@ -67,10 +67,10 @@ export default async function Footer() {
           <h5 className="text-xs font-semibold uppercase tracking-widest text-on-primary/60">
             Khám phá
           </h5>
-          <Link href="/gioi-thieu" className="text-sm text-on-primary/80 hover:text-on-primary transition-colors">
+          <Link href="/about" className="text-sm text-on-primary/80 hover:text-on-primary transition-colors">
             Giới thiệu
           </Link>
-          <Link href="/nha-hang" className="text-sm text-on-primary/80 hover:text-on-primary transition-colors">
+          <Link href="/restaurant" className="text-sm text-on-primary/80 hover:text-on-primary transition-colors">
             Nhà hàng
           </Link>
           <Link href="/spa" className="text-sm text-on-primary/80 hover:text-on-primary transition-colors">

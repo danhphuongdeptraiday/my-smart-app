@@ -245,7 +245,7 @@ export default async function HomePage() {
 
           <div className="grid grid-cols-2 gap-4 md:grid-cols-12 md:gap-gutter md:h-[720px]">
             <Link
-              href="/nha-hang"
+              href="/restaurant"
               className="group relative col-span-2 overflow-hidden rounded aspect-video md:aspect-auto md:col-span-7 md:h-full"
             >
               <Image
