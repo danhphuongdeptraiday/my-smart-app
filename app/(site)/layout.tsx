@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import MobileFab from "@/components/MobileFab";
+import MessengerFab from "@/components/MessengerFab";
 
 export default function SiteLayout({
   children,
@@ -13,6 +14,7 @@ export default function SiteLayout({
       <main className="flex-1 pt-16 md:pt-20">{children}</main>
       <Footer />
       <MobileFab />
+      <MessengerFab />
     </>
   );
 }
